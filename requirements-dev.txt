@@ -2,4 +2,4 @@ pytest>=8
 ruff>=0.6
 # Required by the scripts that parse workflow YAML (audit_workflows.py, estimate_waste.py,
 # check_reusable.py, expand_matrix.py, oidc_check.py) and by their tests.
-pyyaml>=6
+pyyaml>=6.0.4
