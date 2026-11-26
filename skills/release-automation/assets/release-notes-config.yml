@@ -1,0 +1,17 @@
+# Copy to .github/release.yml: categories for "Generate release notes" and
+# `gh release create --generate-notes`, based on pull request labels.
+changelog:
+  exclude:
+    labels: [skip-changelog, dependencies]
+    authors: [dependabot]
+  categories:
+    - title: Breaking changes
+      labels: [breaking-change]
+    - title: Features
+      labels: [enhancement, feature]
+    - title: Bug fixes
+      labels: [bug, fix]
+    - title: Documentation
+      labels: [documentation]
+    - title: Other changes
+      labels: ["*"]

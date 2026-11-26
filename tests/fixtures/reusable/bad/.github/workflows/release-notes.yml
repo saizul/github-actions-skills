@@ -1,0 +1,7 @@
+name: Notes
+on: [workflow_dispatch]
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo notes

@@ -1,0 +1,8 @@
+{
+  "actions/checkout": {
+    "v7": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "v7.0.1": "3d3c42e5aac5ba805825da76410c181273ba90b1"
+  },
+  "actions/setup-node@v7": "949feb2413d6458794dcd2491c4babbbce0c15c1",
+  "actions/cache@v6": "55cc8345863c7cc4c66a329aec7e433d2d1c52a9"
+}

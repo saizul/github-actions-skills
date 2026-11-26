@@ -1,0 +1,57 @@
+# Reusable workflow template. Copy to .github/workflows/_build-test.yml
+# (a leading underscore is a convention for "called, not triggered").
+name: Build and test (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version
+        type: string
+        default: "22"
+      working-directory:
+        description: Package folder in a monorepo
+        type: string
+        default: "."
+      run-e2e:
+        description: Also run end-to-end tests
+        type: boolean
+        default: false
+    secrets:
+      NPM_TOKEN:
+        description: Token for the private registry
+        required: false
+    outputs:
+      artifact-name:
+        description: Name of the uploaded build artifact
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    outputs:
+      artifact-name: ${{ steps.name.outputs.value }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm test
+      - if: ${{ inputs.run-e2e }}
+        run: npm run e2e
+      - id: name
+        run: echo "value=build-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"

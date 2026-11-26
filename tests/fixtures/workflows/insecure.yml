@@ -1,0 +1,38 @@
+name: PR triage
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+env:
+  DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+  LOG_LEVEL: debug
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: some-org/setup-tool@v2
+      - uses: another-org/lint-action@main
+      - name: Greet
+        run: |
+          echo "Title: ${{ github.event.pull_request.title }}"
+          echo "Branch: ${{ github.head_ref }}"
+          echo "Version: ${{ inputs.version }}"
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `${{ github.event.comment.body }}`
+            console.log(body)
+      - uses: docker://alpine:3.20
+        with:
+          args: echo hi
+  label:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - run: gh pr checkout ${{ github.event.number }}

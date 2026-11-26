@@ -1,0 +1,22 @@
+name: Release
+on: [push]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      dry-run: "false"
+      regoin: eu-west-1
+    secrets:
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+  notify:
+    uses: ./.github/workflows/_notify.yml
+  plain:
+    uses: ./.github/workflows/release-notes.yml
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup
+        with:
+          versoin: "22"
+      - uses: ./.github/actions/missing

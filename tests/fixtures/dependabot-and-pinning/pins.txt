@@ -1,0 +1,3 @@
+# owner/repo@ref sha
+actions/setup-python@v7 6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+aws-actions/configure-aws-credentials@v6 45666896f5d8e0f10ae255413f3a4cdd03bdc8f5

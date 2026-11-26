@@ -1,0 +1,33 @@
+name: Reusable test
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: "22"
+      coverage:
+        type: boolean
+        default: false
+    secrets:
+      NPM_TOKEN:
+        required: true
+    outputs:
+      report:
+        description: Coverage report path
+        value: ${{ jobs.test.outputs.report }}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      report: ${{ steps.cov.outputs.path }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm test
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - id: cov
+        if: ${{ inputs.coverage }}
+        run: echo "path=coverage/lcov.info" >> "$GITHUB_OUTPUT"

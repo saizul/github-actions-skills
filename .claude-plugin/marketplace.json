@@ -1,0 +1,36 @@
+{
+  "name": "github-actions-skills",
+  "description": "Agent Skills for writing fast, secure and reliable GitHub Actions workflows.",
+  "owner": {
+    "name": "Saizul Amin",
+    "url": "https://github.com/saizul"
+  },
+  "plugins": [
+    {
+      "name": "github-actions-skills",
+      "source": "./",
+      "description": "GitHub Actions security audit, speed and minutes, reusable workflows and composite actions, releases with provenance, matrices and service containers, OIDC instead of cloud keys, run-log debugging, Dependabot and SHA pinning.",
+      "category": "devops",
+      "tags": [
+        "github-actions",
+        "ci-cd",
+        "workflow",
+        "security",
+        "supply-chain",
+        "oidc",
+        "dependabot",
+        "release"
+      ],
+      "skills": [
+        "./skills/workflow-security-audit",
+        "./skills/workflow-speed",
+        "./skills/reusable-workflows-composite-actions",
+        "./skills/release-automation",
+        "./skills/matrix-and-services",
+        "./skills/secrets-and-oidc",
+        "./skills/workflow-debugging",
+        "./skills/dependabot-and-pinning"
+      ]
+    }
+  ]
+}

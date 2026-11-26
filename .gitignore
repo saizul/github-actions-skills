@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Release artifacts (built by .github/workflows/release.yml)
+dist/
+
+# Local debugging inputs: downloaded run logs, run history and act secrets can contain
+# private data. (Test fixtures live in tests/fixtures/ and are not affected.)
+/run.log
+/runs.json
+/logs_*.zip
+.secrets
+.vars
+/pins.txt
+/resolve-pins.sh
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store

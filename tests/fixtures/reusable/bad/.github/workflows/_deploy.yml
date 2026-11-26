@@ -1,0 +1,25 @@
+name: Reusable deploy
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      dry-run:
+        type: boolean
+        default: true
+    secrets:
+      DEPLOY_KEY:
+        required: true
+    outputs:
+      url:
+        description: Deployed URL
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - run: ./deploy.sh "${{ inputs.region }}"
+        env:
+          KEY: ${{ secrets.DEPLOY_KEY }}
+          SLACK: ${{ secrets.SLACK_WEBHOOK }}

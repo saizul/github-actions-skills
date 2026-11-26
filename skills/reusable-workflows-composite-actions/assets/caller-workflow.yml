@@ -1,0 +1,32 @@
+# Caller template. Local call: ./.github/workflows/<file>.yml (same commit, no ref).
+# Cross-repo call: owner/repo/.github/workflows/<file>.yml@<40-char-sha> # v1.2.0
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  app:
+    uses: ./.github/workflows/_build-test.yml
+    with:
+      working-directory: apps/web
+      run-e2e: ${{ github.event_name == 'push' }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}   # pass by name; avoid `secrets: inherit`
+
+  report:
+    needs: app
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "built $ARTIFACT"
+        env:
+          ARTIFACT: ${{ needs.app.outputs.artifact-name }}

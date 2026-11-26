@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dev tools (pytest, ruff, PyYAML)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Ruff lint
+        run: ruff check .
+      - name: Ruff format
+        run: ruff format --check .
+      - name: Validate skills and plugin manifests
+        run: python tools/validate_skills.py
+      - name: Tests
+        run: pytest
+      - name: Scripts answer --help
+        run: |
+          for f in skills/*/scripts/*.py; do
+            python "$f" --help > /dev/null || { echo "::error file=$f::--help failed"; exit 1; }
+          done
+      - name: Audit this repository's own workflows
+        run: |
+          python skills/workflow-security-audit/scripts/audit_workflows.py . --strict --fail-on low
+          python skills/dependabot-and-pinning/scripts/pin_actions.py .github/workflows

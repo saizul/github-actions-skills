@@ -1,0 +1,25 @@
+{
+  "name": "github-actions-skills",
+  "displayName": "GitHub Actions Skills",
+  "version": "0.1.0",
+  "description": "Agent Skills for GitHub Actions: security audit, speed and wasted minutes, reusable workflows and composite actions, release automation with attestations, matrices and service containers, OIDC to AWS/GCP/Azure, run-log debugging, Dependabot and SHA pinning.",
+  "author": {
+    "name": "Saizul Amin",
+    "url": "https://github.com/saizul"
+  },
+  "homepage": "https://github.com/saizul/github-actions-skills",
+  "repository": "https://github.com/saizul/github-actions-skills",
+  "license": "MIT",
+  "keywords": [
+    "github-actions",
+    "ci-cd",
+    "workflow",
+    "devops",
+    "security",
+    "supply-chain-security",
+    "oidc",
+    "dependabot",
+    "release-automation",
+    "agent-skills"
+  ]
+}

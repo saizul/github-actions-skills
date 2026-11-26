@@ -1,0 +1,11 @@
+name: CI
+on: [push]
+permissions:
+  contents: read
+jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
+    with:
+      coverage: true
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

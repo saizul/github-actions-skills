@@ -1,0 +1,28 @@
+# Composite action template. Copy to .github/actions/setup-project/action.yml and use with
+#   - uses: ./.github/actions/setup-project        (after actions/checkout)
+name: Setup project
+description: Install the toolchain and dependencies with caching
+inputs:
+  node-version:
+    description: Node.js version
+    default: "22"
+  install-args:
+    description: Extra arguments for npm ci
+    default: ""
+outputs:
+  cache-hit:
+    description: Whether the npm cache was restored
+    value: ${{ steps.node.outputs.cache-hit }}
+runs:
+  using: composite
+  steps:
+    - id: node
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+    - name: Install dependencies
+      shell: bash                      # required for every run step in a composite action
+      env:
+        INSTALL_ARGS: ${{ inputs.install-args }}
+      run: npm ci $INSTALL_ARGS

@@ -1,0 +1,59 @@
+name: Integration
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  good:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:8
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
+    steps:
+      - run: npm test
+  bad:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres
+      mysql:
+        image: mysql:8.4
+        ports: ["3306:3306"]
+    steps:
+      - run: npm test
+  in-container:
+    runs-on: ubuntu-latest
+    container: node:22
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - run: npm test
+  mac:
+    runs-on: macos-latest
+    services:
+      redis:
+        image: redis:8
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping"
+    steps:
+      - run: npm test

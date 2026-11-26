@@ -1,0 +1,47 @@
+name: Matrix
+on: [push]
+permissions:
+  contents: read
+jobs:
+  docs-example:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fruit: [apple, pear]
+        animal: [cat, dog]
+        include:
+          - color: green
+          - color: pink
+            animal: cat
+          - fruit: apple
+            shape: circle
+          - fruit: banana
+          - fruit: banana
+            animal: cat
+    steps:
+      - run: echo "${{ matrix.fruit }}"
+  versions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22, 24]
+        exclude:
+          - os: windows-latest
+            node: 20
+          - os: macos-latest
+            node: 22
+        include:
+          - os: ubuntu-latest
+            node: 24
+            coverage: true
+    steps:
+      - run: npm test
+  dynamic:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.plan.outputs.packages) }}
+    steps:
+      - run: echo hi

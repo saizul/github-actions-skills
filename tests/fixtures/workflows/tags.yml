@@ -1,0 +1,20 @@
+name: Tags
+on: [push]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Node
+        uses: "actions/setup-node@v7"   # keep comment
+        with:
+          node-version: 22
+      - uses: actions/cache@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: some-org/unknown-action@v1
+      - uses: ./.github/actions/local
+      - uses: docker://alpine:3.20
+  reusable:
+    uses: acme/ci/.github/workflows/build.yml@v2

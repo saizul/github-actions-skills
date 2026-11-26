@@ -1,0 +1,15 @@
+name: Setup
+description: Broken composite action
+inputs:
+  token:
+    description: Registry token
+    required: true
+outputs:
+  version:
+    description: Installed version
+runs:
+  using: composite
+  steps:
+    - run: npm ci --registry "${{ inputs.registry }}"
+    - run: echo "${{ secrets.NPM_TOKEN }}" > .npmrc
+      shell: bash

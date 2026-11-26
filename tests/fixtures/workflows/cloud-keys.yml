@@ -1,0 +1,37 @@
+name: Deploy (static keys)
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  aws:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      - run: aws s3 sync dist s3://example-bucket
+  gcp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+  azure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/login@v3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - run: |
+          curl -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" https://api.example.com/deploy
+  oidc-no-perm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/deploy
+          aws-region: eu-west-1

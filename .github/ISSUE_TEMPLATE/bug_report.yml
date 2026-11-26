@@ -1,0 +1,46 @@
+name: Bug report
+description: A script crashed, reported a wrong finding, or a skill gave wrong or unsafe advice
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste secrets, tokens, private run logs or workflow files with internal hostnames.**
+        Reduce the workflow or log to the few lines that reproduce the problem and replace values with fakes.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - workflow-security-audit
+        - workflow-speed
+        - reusable-workflows-composite-actions
+        - release-automation
+        - matrix-and-services
+        - secrets-and-oidc
+        - workflow-debugging
+        - dependabot-and-pinning
+        - validator / repository tooling
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: The command you ran, its output, and (for wrong findings) a minimal workflow YAML or log excerpt.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Python 3.12, PyYAML 6.0.2, macOS / Ubuntu, Claude Code / Codex CLI"
+    validations:
+      required: true
