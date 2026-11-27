@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `workflow-security-audit`: `checkout.persist_creds` check for `actions/checkout` steps that
+  keep the default `persist-credentials: true`, which leaves the job token in `.git/config`
+  for every later step. Low by default, medium under `pull_request_target` or
+  `workflow_run`; the line points at the checkout step.
+
 ## [0.1.0] - 2026-11-26
 
 ### Added

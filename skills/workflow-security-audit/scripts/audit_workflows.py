@@ -9,6 +9,7 @@ Checks:
   permissions.broad        write scopes granted at workflow level (prefer per job)
   prt.checkout_pr_code     pull_request_target / workflow_run checking out or running PR code
   prt.trigger              pull_request_target present (review it)
+  checkout.persist_creds   actions/checkout without persist-credentials: false (token left in .git/config)
   injection.run            untrusted ${{ github.event.* }} / github.head_ref inside run:
   injection.script         the same inside actions/github-script `script:`
   injection.input          ${{ inputs.* }} / step outputs inside run: (lower risk)
@@ -100,6 +101,11 @@ class Locator:
                 return i + 1
         return None
 
+    def last(self, needle: str) -> int | None:
+        """Line of the most recent find() hit for needle, without advancing."""
+        needle = needle.strip().splitlines()[0] if needle.strip() else needle
+        return self.pos.get(needle)
+
 
 def finding(check, severity, path, line, job, title, fix):
     return {
@@ -168,6 +174,13 @@ def check_uses(uses: str, path, loc, job, strict: bool) -> list[dict]:
 
 def expressions(text: str) -> list[str]:
     return [m.strip() for m in EXPR_RE.findall(text or "")]
+
+
+def checkout_drops_credentials(with_) -> bool:
+    if not isinstance(with_, dict):
+        return False
+    value = with_.get("persist-credentials", True)
+    return str(value).strip().lower() == "false"
 
 
 def check_permissions(wf, path, loc) -> list[dict]:
@@ -347,6 +360,20 @@ def audit_text(text: str, path="workflow.yml", public: bool = False, strict: boo
                             job_id,
                             "privileged trigger checks out untrusted PR code (pwn request)",
                             "split into pull_request (build, no secrets) + workflow_run that only reads artifacts",
+                        )
+                    )
+                if str(uses).startswith("actions/checkout@") and not checkout_drops_credentials(with_):
+                    sev = "medium" if privileged else "low"
+                    out.append(
+                        finding(
+                            "checkout.persist_creds",
+                            sev,
+                            path,
+                            loc.last(str(uses).strip()) or loc.find(str(uses).strip()),
+                            job_id,
+                            "actions/checkout leaves GITHUB_TOKEN in .git/config for every later step"
+                            + (" (privileged trigger)" if privileged else ""),
+                            "add `with: persist-credentials: false` unless a later step must git push",
                         )
                     )
                 if str(uses).startswith("actions/github-script"):

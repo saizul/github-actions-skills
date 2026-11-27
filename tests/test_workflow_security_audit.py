@@ -238,3 +238,54 @@ def test_skill_templates_pass_their_own_audit():
     ]
     r = run_script(SKILL, SCRIPT, *map(str, paths), "--strict", "--fail-on", "low")
     assert r.returncode == 0, r.stdout
+
+
+PERSIST_WF = """
+on: {on}
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+{with_block}
+"""
+
+
+def persist_findings(on="push", with_block=""):
+    return checks(run(PERSIST_WF.format(on=on, with_block=with_block)), "checkout.persist_creds")
+
+
+def test_checkout_without_persist_credentials_is_low():
+    found = persist_findings()
+    assert len(found) == 1
+    assert found[0]["severity"] == "low"
+    assert found[0]["job"] == "build"
+    assert found[0]["line"] == 9
+
+
+def test_checkout_with_persist_credentials_false_is_clean():
+    block = "        with:\n          persist-credentials: false"
+    assert persist_findings(with_block=block) == []
+    quoted = "        with:\n          persist-credentials: 'false'"
+    assert persist_findings(with_block=quoted) == []
+
+
+def test_checkout_with_persist_credentials_true_is_flagged():
+    block = "        with:\n          persist-credentials: true\n          fetch-depth: 0"
+    assert len(persist_findings(with_block=block)) == 1
+
+
+def test_checkout_persist_credentials_is_medium_on_privileged_trigger():
+    found = persist_findings(on="pull_request_target")
+    assert [f["severity"] for f in found] == ["medium"]
+    assert "privileged" in found[0]["title"]
+
+
+def test_checkout_persist_credentials_can_be_ignored(tmp_path):
+    wf = tmp_path / "ci.yml"
+    wf.write_text(PERSIST_WF.format(on="push", with_block=""), encoding="utf-8")
+    result = run_script(SKILL, SCRIPT, str(wf), "--json", "--fail-on", "low", "--ignore", "checkout.persist_creds")
+    assert result.returncode == 0
+    assert json.loads(result.stdout)["findings"] == []
