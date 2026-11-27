@@ -15,6 +15,7 @@
 | `secrets.workflow_env` | medium | Workflow-level `env` is visible to every step of every job, including all third-party actions and anything they spawn. | Step-level `env:` or `with:` for the single step that needs it. |
 | `secrets.inherit` | low | Passes all repository/org secrets to the called workflow. | Declare `secrets:` in the called workflow and pass them by name. |
 | `runner.self_hosted` | high with `--public`, medium with PR triggers, info otherwise | Fork PRs on a public repo can run arbitrary code on a persistent machine (network access, leftover credentials, cache poisoning). | GitHub-hosted runners for public repos; otherwise ephemeral/JIT runners, a runner group restricted to private repos, "Require approval for all outside collaborators". |
+| `checkout.persist_creds` | low, medium on `pull_request_target`/`workflow_run` | `actions/checkout` writes the job token into `.git/config` by default, so every later step, action and uploaded artifact of the workspace can read it. | `with: persist-credentials: false`; keep the default only in jobs that `git push`, and `--ignore checkout.persist_creds` there if needed. |
 | `commands.unsecure` | high | Re-enables the deprecated `set-env`/`add-path` workflow commands that any log line can trigger. | Remove; write to `$GITHUB_ENV` / `$GITHUB_PATH` with care. |
 
 ## Known limits

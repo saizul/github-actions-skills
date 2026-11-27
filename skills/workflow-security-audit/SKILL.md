@@ -53,8 +53,9 @@ Paths below are relative to this skill's folder (in Claude Code: `${CLAUDE_SKILL
    2. `injection.run` / `injection.script`: move every untrusted value to `env:` and quote it.
    3. `action.unpinned` (third-party, branch refs), `permissions.write_all`,
       `runner.self_hosted` with `--public`.
-   4. `permissions.missing`, `secrets.workflow_env`, `action.docker_unpinned`.
-   5. Low/info: first-party tags, `secrets: inherit`, `inputs.*` in run, `prt.trigger`.
+   4. `permissions.missing`, `secrets.workflow_env`, `action.docker_unpinned`,
+      `checkout.persist_creds` on privileged triggers.
+   5. Low/info: first-party tags, `checkout.persist_creds` (token left in `.git/config`), `secrets: inherit`, `inputs.*` in run, `prt.trigger`.
 4. **Read the workflow yourself** for what the script cannot know: who can trigger
    `workflow_dispatch`/`issue_comment` commands, whether artifacts from untrusted runs are
    executed later, `GITHUB_ENV` writes built from untrusted text, caches shared with
